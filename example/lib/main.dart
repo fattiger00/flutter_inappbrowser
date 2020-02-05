@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
-import 'package:flutter_inappbrowser_example/chrome_safari_example.screen.dart';
-import 'package:flutter_inappbrowser_example/inline_example.screen.dart';
-import 'package:flutter_inappbrowser_example/webview_example.screen.dart';
+
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_example/chrome_safari_browser_example.screen.dart';
+import 'package:flutter_inappwebview_example/in_app_webiew_example.screen.dart';
+import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart';
 
 // InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 
@@ -12,15 +14,46 @@ Future main() async {
   runApp(new MyApp());
 }
 
+Drawer myDrawer({@required BuildContext context}) {
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          child: Text('flutter_inappbrowser example'),
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+        ),
+        ListTile(
+          title: Text('InAppBrowser'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/InAppBrowser');
+          },
+        ),
+        ListTile(
+          title: Text('ChromeSafariBrowser'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
+          },
+        ),
+        ListTile(
+          title: Text('InAppWebView'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/');
+          },
+        ),
+      ],
+    ),
+  );
+}
+
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => new _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  InAppWebViewController webView;
-  String url = "";
-  double progress = 0;
 
   @override
   void initState() {
@@ -35,32 +68,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Tabs Demo'),
-          ),
-          body: TabBarView(
-            children: [
-              WebviewExampleScreen(),
-              ChromeSafariExampleScreen(),
-              InlineExampleScreen(),
-            ],
-          ),
-          bottomNavigationBar: Container(
-            color: Theme.of(context).primaryColor,
-            child: TabBar(
-              indicatorColor: Colors.white,
-              tabs: [
-                Tab(text: "Webview"),
-                Tab(text: "Chrome/Safari"),
-                Tab(
-                  text: "Inline",
-                ),
-              ],
-            ),
-          ))),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => InAppWebViewExampleScreen(),
+          '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+          '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
+        }
     );
   }
 }

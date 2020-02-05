@@ -1,6 +1,6 @@
 //
 //  InAppBrowserWebViewController.swift
-//  flutter_inappbrowser
+//  flutter_inappwebview
 //
 //  Created by Lorenzo on 17/09/18.
 //
@@ -65,7 +65,7 @@ typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, B
 class InAppWebView_IBWrapper: InAppWebView {
     required init(coder: NSCoder) {
         let config = WKWebViewConfiguration()
-        super.init(frame: .zero, configuration: config, IABController: nil, IAWController: nil)
+        super.init(frame: .zero, configuration: config, IABController: nil, channel: nil)
         self.translatesAutoresizingMaskIntoConstraints = false
     }
 }
@@ -114,17 +114,40 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
-            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, IAWController: nil)
+            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, channel: nil)
             self.containerWebView.addSubview(self.webView)
             prepareConstraints()
             prepareWebView()
             
-            if self.initData == nil {
-                loadUrl(url: self.initURL!, headers: self.initHeaders)
+            if #available(iOS 11.0, *) {
+                if let contentBlockers = webView!.options?.contentBlockers, contentBlockers.count > 0 {
+                    do {
+                        let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
+                        let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                        WKContentRuleListStore.default().compileContentRuleList(
+                            forIdentifier: "ContentBlockingRules",
+                            encodedContentRuleList: blockRules) { (contentRuleList, error) in
+                                
+                                if let error = error {
+                                    print(error.localizedDescription)
+                                    return
+                                }
+                                
+                                let configuration = self.webView!.configuration
+                                configuration.userContentController.add(contentRuleList!)
+                                
+                                self.initLoad(initURL: self.initURL, initData: self.initData, initMimeType: self.initMimeType, initEncoding: self.initEncoding, initBaseUrl: self.initBaseUrl, initHeaders: self.initHeaders)
+                                
+                                self.navigationDelegate?.onBrowserCreated(uuid: self.uuid, webView: self.webView)
+                        }
+                        return
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
             }
-            else {
-                webView.loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
-            }
+            
+            initLoad(initURL: initURL, initData: initData, initMimeType: initMimeType, initEncoding: initEncoding, initBaseUrl: initBaseUrl, initHeaders: initHeaders)
             
             navigationDelegate?.onBrowserCreated(uuid: uuid, webView: webView)
         }
@@ -132,6 +155,14 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         super.viewWillAppear(animated)
     }
     
+    func initLoad(initURL: URL?, initData: String?, initMimeType: String?, initEncoding: String?, initBaseUrl: String?, initHeaders: [String: String]?) {
+        if self.initData == nil {
+            loadUrl(url: self.initURL!, headers: self.initHeaders)
+        }
+        else {
+            webView.loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -163,12 +194,21 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     
     // Prevent crashes on closing windows
     deinit {
-        webView.removeObserver(self, forKeyPath: "estimatedProgress")
-        webView.uiDelegate = nil
+        print("InAppBrowserWebViewController - dealloc")
     }
     
     override func viewWillDisappear (_ animated: Bool) {
         super.viewWillDisappear(animated)
+        webView.dispose()
+        navigationDelegate = nil
+        transitioningDelegate = nil
+        urlField.delegate = nil
+        closeButton.removeTarget(self, action: #selector(self.close), for: .touchUpInside)
+        forwardButton.target = nil
+        forwardButton.target = nil
+        backButton.target = nil
+        reloadButton.target = nil
+        shareButton.target = nil
     }
     
     func prepareConstraints () {

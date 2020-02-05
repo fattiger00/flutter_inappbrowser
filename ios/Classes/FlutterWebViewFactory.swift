@@ -1,6 +1,6 @@
 //
 //  FlutterWebViewFactory.swift
-//  flutter_inappbrowser
+//  flutter_inappwebview
 //
 //  Created by Lorenzo on 13/11/18.
 //
@@ -9,7 +9,7 @@ import Flutter
 import Foundation
 
 public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
-    private weak var registrar: FlutterPluginRegistrar?
+    private var registrar: FlutterPluginRegistrar?
     
     init(registrar: FlutterPluginRegistrar?) {
         super.init()
@@ -22,7 +22,10 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
     
     public func create(withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: Any?) -> FlutterPlatformView {
         let arguments = args as? NSDictionary
-        let webviewController = FlutterWebViewController(registrar: registrar!, withFrame: frame, viewIdentifier: viewId, arguments: arguments!)
+        let webviewController = FlutterWebViewController(registrar: registrar!,
+                                                         withFrame: frame,
+                                                         viewIdentifier: viewId,
+                                                         arguments: arguments!)
         return webviewController
     }
 }

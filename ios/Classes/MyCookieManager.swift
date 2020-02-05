@@ -1,6 +1,6 @@
 //
 //  MyCookieManager.swift
-//  flutter_inappbrowser
+//  flutter_inappwebview
 //
 //  Created by Lorenzo on 26/10/18.
 //
@@ -24,7 +24,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
         MyCookieManager.registrar = registrar
         MyCookieManager.httpCookieStore = WKWebsiteDataStore.default().httpCookieStore
         
-        MyCookieManager.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser_cookiemanager", binaryMessenger: registrar.messenger())
+        MyCookieManager.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_cookiemanager", binaryMessenger: registrar.messenger())
         registrar.addMethodCallDelegate(self, channel: MyCookieManager.channel!)
     }
     
@@ -52,17 +52,17 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 let name = arguments!["name"] as! String
                 let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
-                MyCookieManager.deleteCookie(url: url, name: name, domain: domain, path: path, result: result);
+                MyCookieManager.deleteCookie(url: url, name: name, domain: domain, path: path, result: result)
                 break;
             case "deleteCookies":
                 let url = arguments!["url"] as! String
                 let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
-                MyCookieManager.deleteCookies(url: url, domain: domain, path: path, result: result);
+                MyCookieManager.deleteCookies(url: url, domain: domain, path: path, result: result)
                 break;
             case "deleteAllCookies":
-                MyCookieManager.deleteAllCookies(result: result);
-                break;
+                MyCookieManager.deleteAllCookies(result: result)
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break
@@ -93,8 +93,9 @@ class MyCookieManager: NSObject, FlutterPlugin {
         properties[.secure] = (isSecure != nil && isSecure!) ? "TRUE" : "FALSE"
         
         let cookie = HTTPCookie(properties: properties)!
-        MyCookieManager.httpCookieStore!.setCookie(cookie)
-        result(true)
+        MyCookieManager.httpCookieStore!.setCookie(cookie, completionHandler: {() in
+            result(true)
+        })
     }
     
     public static func getCookies(url: String, result: @escaping FlutterResult) {

@@ -6,8 +6,11 @@ about: Something is crashing or not working as intended
 
 ## Environment
 
-**App version:**  <!-- Add branch if necessary -->  
+**Flutter version:** 
+**Plugin version:**  <!-- Add branch if necessary -->  
 **Android version:**  <!-- If customize ROM, write which -->  
+**iOS version:**
+**Xcode version:**  
 **Device information:**  <!-- Manufacturer and model -->  
 
 ## Description
