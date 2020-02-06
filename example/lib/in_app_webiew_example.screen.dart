@@ -59,6 +59,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
+                      print("onWebViewCreated");
                     },
                     onLoadStart: (InAppWebViewController controller, String url) {
                       print("onLoadStart $url");

@@ -81,7 +81,7 @@ See the online [API Reference](https://pub.dartlang.org/documentation/flutter_in
 
 The API showed in this `README.md` file shows only a part of the documentation that conforms to the master branch only. 
 So, here you could have methods, options, and events that aren't published yet.
-If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).  
+If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).
 
 ### Load a file inside `assets` folder
 
@@ -530,8 +530,7 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
     print("\n\n override ${shouldOverrideUrlLoadingRequest.url}\n\n");
-    this.webViewController.loadUrl(url: shouldOverrideUrlLoadingRequest.url);
-    return ShouldOverrideUrlLoadingAction.CANCEL;
+    return ShouldOverrideUrlLoadingAction.ALLOW;
   }
 
   @override
@@ -641,8 +640,8 @@ Specific options of the `InAppBrowser` class are:
 * `toolbarBottomTranslucent`: Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
 * `closeButtonCaption`: Set the custom text for the close button.
 * `closeButtonColor`: Set the custom color for the close button.
-* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IosWebViewOptionsPresentationStyle.FULL_SCREEN`.
-* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IosWebViewOptionsTransitionStyle.COVER_VERTICAL`.
+* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IOSUIModalPresentationStyle.FULL_SCREEN`.
+* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IOSUIModalTransitionStyle.COVER_VERTICAL`.
 * `spinner`: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
 
 #### `InAppBrowser` Events
@@ -698,8 +697,8 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 
   @override
-  void onLoaded() {
-    print("ChromeSafari browser loaded");
+  void onCompletedInitialLoad() {
+    print("ChromeSafari browser initial load completed");
   }
 
   @override
@@ -737,7 +736,7 @@ class _MyAppState extends State<MyApp> {
                 await widget.browser.open(
                     url: "https://flutter.dev/",
                     options: ChromeSafariBrowserClassOptions(
-                        android: AndroidChromeCustomTabsOptions(addShareButton: false),
+                        android: AndroidChromeCustomTabsOptions(addDefaultShareMenuItem: false),
                         ios: IosSafariOptions(barCollapsingEnabled: true)));
               },
               child: Text("Open Chrome Safari Browser")),
@@ -767,26 +766,28 @@ Screenshots:
 
 ##### `ChromeSafariBrowser` Android-specific options
 
-* `addShareButton`: Set to `false` if you don't want the default share button. The default value is `true`.
+* `addDefaultShareMenuItem`: Set to `false` if you don't want the default share item to the menu. The default value is `true`.
 * `showTitle`: Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
 * `toolbarBackgroundColor`: Set the custom background color of the toolbar.
 * `enableUrlBarHiding`: Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
 * `instantAppsEnabled`: Set to `true` to enable Instant Apps. The default value is `false`.
+* `packageName`: Set the name of the application package to handle the intent (for example `com.android.chrome`), or null to allow any application package.
+* `keepAliveEnabled`: Set to `true` to enable Keep Alive. The default value is `false`.
 
 ##### `ChromeSafariBrowser` iOS-specific options
 
 * `entersReaderIfAvailable`: Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
 * `barCollapsingEnabled`: Set to `true` to enable bar collapsing. The default value is `false`.
-* `dismissButtonStyle`: Set the custom style for the dismiss button. The default value is `IosSafariOptionsDismissButtonStyle.DONE`.
+* `dismissButtonStyle`: Set the custom style for the dismiss button. The default value is `IOSSafariDismissButtonStyle.DONE`.
 * `preferredBarTintColor`: Set the custom background color of the navigation bar and the toolbar.
 * `preferredControlTintColor`: Set the custom color of the control buttons on the navigation bar and the toolbar.
-* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IosWebViewOptionsPresentationStyle.FULL_SCREEN`.
-* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IosWebViewOptionsTransitionStyle.COVER_VERTICAL`.
+* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IOSUIModalPresentationStyle.FULL_SCREEN`.
+* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IOSUIModalTransitionStyle.COVER_VERTICAL`.
 
 #### `ChromeSafariBrowser` Events
 
 * `onOpened`: Event fires when the `ChromeSafariBrowser` is opened.
-* `onLoaded`: Event fires when the `ChromeSafariBrowser` is loaded.
+* `onCompletedInitialLoad`: Event fires when the initial URL load is complete.
 * `onClosed`: Event fires when the `ChromeSafariBrowser` is closed.
 
 ### `InAppLocalhostServer` class
